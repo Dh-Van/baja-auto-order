@@ -1,0 +1,17 @@
+[project]
+name = "auto-ordering"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "asyncio>=4.0.0",
+    "bs4>=0.0.2",
+    "dotenv>=0.9.9",
+    "flask>=3.1.1",
+    "flask-cors>=6.0.1",
+    "lxml>=6.0.0",
+    "requests>=2.32.4",
+    "rq>=2.5.0",
+    "selenium>=4.35.0",
+]
