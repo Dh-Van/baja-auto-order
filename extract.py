@@ -5,16 +5,12 @@ from datetime import datetime
 import dotenv, os
 import requests
 from concurrent.futures import ThreadPoolExecutor
+import logging
 
 dotenv.load_dotenv()
 
-def html_ms(filename, input_content=None):
-    if(input_content): 
-        html_content = input_content
-    else:
-        with open(filename, 'r', encoding='utf-8') as f:
-            html_content = f.read()
-
+def html_ms(input_content):
+    html_content = input_content
 
     soup = bs4.BeautifulSoup(html_content, 'lxml')
     cart_items = soup.select('[id^="cartitem_"]')
@@ -37,13 +33,8 @@ def html_ms(filename, input_content=None):
 
     return output_cart
 
-def html_mc(filename, input_content = None):
-    if(input_content): 
-        html_content = input_content
-    else: 
-        with open(filename, 'r', encoding='utf-8') as f:
-            html_content = f.read()
-
+def html_mc(input_content):
+    html_content = input_content
 
     soup = bs4.BeautifulSoup(html_content, 'lxml')
     cart_items = soup.select('[class="order-pad-line"]')
@@ -87,7 +78,7 @@ def array_to_csv(data, output_filename):
             writer.writerow(item_dict)
 
 def raw_to_array(raw_input):
-    header = ['ordered', 'approved', 'vendor', 'part_number', 'description', 'unit_price', 'quantity', 'dimensions', 'link']
+    header = ['ordered', 'approved', 'name', 'subteam', 'vendor', 'part_number', 'description', 'unit_price', 'quantity', 'dimensions', 'link']
     mc = []
     ms = []
 
@@ -205,13 +196,21 @@ def create_vendor_part(vendor, item):
         }
 
 
-def submit(vendor, data):
+def submit(vendor, data, name, subteam):
     form_link_template = os.getenv('SUBMIT_FORM_LINK')
     
     request_list = []
     for item in data:
         item_dict = {kv[0]: kv[1] for kv in item}
-        form_link_filled = form_link_template.format_map(create_vendor_part(vendor, item_dict))
+        part_dict = create_vendor_part(vendor, item_dict)
+        part_dict['name'] = name
+        part_dict['subteam'] = subteam
+        logging.warning('test!')
+        logging.warning(part_dict)
+        form_link_filled = form_link_template.format_map(part_dict)
+        # print(name, subteam)
+        # form_link_filled = form_link_filled.format(name=name, subteam=subteam)
+        print(form_link_filled)
         request_list.append(form_link_filled)
 
     with ThreadPoolExecutor(max_workers=10) as executor:
@@ -219,15 +218,25 @@ def submit(vendor, data):
     
     print(f'All {len(data)} parts have been submitted')
 
-def metal_supermarkets(html_filepath, input_content=None):
-    data = html_ms(html_filepath, input_content)
-    submit('MetalSupermarkets', data)
-
-def mcmaster(html_filepath, input_content=None):
-    print('Method Called')
-    data = html_mc(html_filepath, input_content)
-    submit('McMaster', data)
+def metal_supermarkets(input_content, name, subteam):
+    data = html_ms(input_content)
+    submit('MetalSupermarkets', data, name, subteam)
     return data
+
+def mcmaster(input_content, name, subteam):
+    data = html_mc(input_content)
+    submit('McMaster', data, name, subteam)
+    return data
+
+# def metal_supermarkets(html_filepath, input_content=None):
+#     data = html_ms(html_filepath, input_content)
+#     submit('MetalSupermarkets', data)
+
+# def mcmaster(html_filepath, input_content=None):
+#     print('Method Called')
+#     data = html_mc(html_filepath, input_content)
+#     submit('McMaster', data)
+#     return data
 
 # mcmaster('inputs/mc.html')
 # metal_supermarkets('inputs/cart.html')

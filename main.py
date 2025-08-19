@@ -62,7 +62,7 @@ async def async_add_to_cart(job_id: str, csv_data):
     except Exception as e:
         update_job(job_id, "failed", error=str(e))
 
-async def async_extract(job_id: str, vendor: str, filename: str, html_content: str):
+async def async_extract(job_id: str, vendor: str, filename: str, html_content: str, name: str, subteam: str):
     """Async wrapper for extract functions"""
     try:
         update_job(job_id, "processing")
@@ -72,15 +72,17 @@ async def async_extract(job_id: str, vendor: str, filename: str, html_content: s
             result = await loop.run_in_executor(
                 executor, 
                 extract.metal_supermarkets, 
-                filename, 
-                html_content
+                html_content,
+                name,
+                subteam
             )
         elif vendor == "McMaster":
             result = await loop.run_in_executor(
                 executor,
                 extract.mcmaster,
-                filename,
-                html_content
+                html_content,
+                name,
+                subteam
             )
         else:
             raise ValueError(f"Unsupported vendor: {vendor}")
@@ -123,6 +125,8 @@ def request_parts():
 
     files = request.files.getlist('file')
     vendor = request.form.get('vendor')
+    name = request.form.get('name')
+    subteam = request.form.get('subteam')
 
     if not vendor:
         return jsonify({"error": "Vendor is required"}), 400
@@ -152,7 +156,7 @@ def request_parts():
             
             # Create job and run async
             job_id = create_job(f"extract_{vendor}")
-            run_async_task(async_extract(job_id, vendor, filename, html_content))
+            run_async_task(async_extract(job_id, vendor, filename, html_content, name, subteam))
             job_ids.append({"file": filename, "job_id": job_id})
 
         except Exception as e:
