@@ -16,7 +16,7 @@ dotenv.load_dotenv()
 
 def get_driver_wait():
     CHROME_BROWSER_PATH = '/opt/google/chrome/google-chrome'
-    CHROMEDRIVER_PATH = '/home/dhvan/Documents/auto-ordering/chromedriver'
+    CHROMEDRIVER_PATH = '/home/dhvan/Documents/baja-auto-order/chromedriver'
 
     chrome_options = Options()
     chrome_options.binary_location = CHROME_BROWSER_PATH
@@ -219,13 +219,15 @@ def mc_paste_cart(driver, wait, data):
             EC.element_to_be_clickable((By.CLASS_NAME, 'order-pad-add-line'))
         )
 
-        add_line_button.click()
+        # add_line_button.click()
+        driver.execute_script("arguments[0].click();", add_line_button)
 
         switch_button = short_wait.until(
             EC.element_to_be_clickable((By.CLASS_NAME, 'switch-mode-link'))
         )
 
-    switch_button.click()
+    # switch_button.click()
+    driver.execute_script("arguments[0].click();", switch_button)
 
     bulk_input = wait.until(
         EC.element_to_be_clickable((By.ID, 'bulk-lines-textarea'))

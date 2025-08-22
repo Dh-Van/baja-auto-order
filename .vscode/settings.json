@@ -4,24 +4,7 @@
         "**/.svn": true,
         "**/.hg": true,
         "**/.DS_Store": true,
-        "**/Thumbs.db": true,
-        "uv.lock": true,
-        "README.md": true,
-        "chromedriver": true,
-        ".python-version": true,
-        "__pycache__": true,
-        ".venv": true,
-        ".vscode": true,
-        ".gitignore": true
+        "**/Thumbs.db": true
     },
-    "hide-files.files": [
-        "uv.lock",
-        "README.md",
-        "chromedriver",
-        ".python-version",
-        "__pycache__",
-        ".venv",
-        ".vscode",
-        ".gitignore"
-    ]
+    "hide-files.files": []
 }
